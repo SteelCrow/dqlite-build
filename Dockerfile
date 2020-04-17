@@ -1,9 +1,9 @@
 FROM golang:1.13.4-alpine3.10 as build
 
 ARG LIBCO_VER=v20
-ARG RAFT_VER=6721b84811be901ef0025d24c8ab1b468f39d0bf
-ARG DQLITE_VER=v1.3.1
-ARG GO_DQLITE_VER=v1.3.0
+ARG RAFT_VER=v0.9.18
+ARG DQLITE_VER=v1.4.1
+ARG GO_DQLITE_VER=v1.5.0
 
 ENV PREFIX /usr/local
 ENV CONFIG_FLAGS --prefix=$PREFIX
@@ -65,9 +65,12 @@ RUN git clone --depth 1 https://github.com/canonical/dqlite.git -b $DQLITE_VER &
 # --- Build static dqlite-demo
 
 RUN go get -d github.com/spf13/cobra
+RUN go get -d github.com/lxc/lxd/shared
+RUN go get -d golang.org/x/sys/unix 
 RUN go get -d github.com/canonical/go-dqlite && \
     cd /go/src/github.com/canonical/go-dqlite && \
     git checkout $GO_DQLITE_VER && \
+    pwd && \
     ls /patch/go-dqlite-* | xargs -r -n1 patch -p1 -i && \
     go install \
         -tags libsqlite3 \
